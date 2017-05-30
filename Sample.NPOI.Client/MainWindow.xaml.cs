@@ -15,6 +15,7 @@ using System.Windows.Shapes;
 using MahApps.Metro.Controls;
 using Microsoft.Win32;
 using NPOI.Extension;
+using System.IO;
 
 namespace Sample.NPOI.Client
 {
@@ -35,16 +36,43 @@ namespace Sample.NPOI.Client
 
         private void btnOpen_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog ofd = new OpenFileDialog();
+            OpenFileDialog ofd = new OpenFileDialog
+            {
+                DefaultExt = ".xlsx",
+                Filter = "Excel file|*.xlsx",
+                Title = "Choose a path to open an excel file."
+            };
+
             if (ofd.ShowDialog() == true)
-                Excel.Load<ItemModel>(ofd.FileName);
+            {
+                dg.ItemsSource = Excel.Load<ItemModel>(ofd.FileName);
+
+                MessageBox.Show("File opened successfully.");
+            }
         }
 
         private void btnSave_Click(object sender, RoutedEventArgs e)
         {
-            SaveFileDialog sfd = new SaveFileDialog();
+            SaveFileDialog sfd = new SaveFileDialog
+            {
+                OverwritePrompt = true,
+                AddExtension = true,
+                DefaultExt = ".xlsx",
+                Filter = "Excel file|*.xlsx",
+                Title = "Choose a path to save the excel file."
+            };
+
             if(sfd.ShowDialog() == true)
+            {
+                if (File.Exists(sfd.FileName))
+                {
+                    File.Delete(sfd.FileName);
+                }
+
                 dg.ItemsSource.Cast<ItemModel>().ToExcel(sfd.FileName);
+
+                MessageBox.Show("File saved successfully.");
+            }
         }
     }
 }
